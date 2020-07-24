@@ -45,16 +45,25 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(color)
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.speed_up = -20
+        self.speed_down = 20
+        self.stop = 0
 
         self.rect = self.image.get_rect()
         self.rect.x = 20
         self.rect.y = screen_height // 2
 
+    def set_speed(self, speed_up,speed_down,stop):
+        self.speed_up = speed_up
+        self.speed_down = speed_down
+        self.stop = stop
+
     def moveup(self):
-        self.rect.y = +5
+        self.rect.y += self.speed_up
 
     def movedown(self):
-        self.rect.y = -5
+        self.rect.y += self.speed_down
+
 
 
 def main():
@@ -110,6 +119,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+
+            elif event.type == pygame.KEYDOWN:
+                # Figure out if it was an arrow key. If so
+                # adjust speed.
+                if event.key == pygame.K_UP:
+                    player.moveup()
+                elif event.key == pygame.K_DOWN:
+                    player.movedown()
+
         # ALL EVENT PROCESSING SHOULD GO ABOVE THIS COMMENT
 
         # ALL GAME LOGIC SHOULD GO BELOW THIS COMMENT
