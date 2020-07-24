@@ -16,25 +16,23 @@ BLUE = (0, 0, 255)
 GREEN = (66, 245, 96)
 
 screen_width = 800
-screen_height = 800
+screen_height = 533
 
-background_image = pygame.image.load("Underwater_bubbles.jpg").convert()
-player_image = pygame.image.load("fishTile_080.png").convert()
-enemy_image = pygame.image.load("fishTile_enemy").convert()
-click_sound = pygame.mixer.Sound("pop.ogg")
+
+
 # ---- Classes
 class Enemy(pygame.sprite.Sprite):
-
+    """ This class is the enemy parent class"""
     def __init__(self):
         super().__init__()
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.width = 10
-        self.height = 10
-        self.color = BLACK
+        # self.screen_width = screen_width
+        # self.screen_height = screen_height
+        # self.width = 10
+        # self.height = 10
+        # self.color = BLACK
         self.speed = 5
-        self.image = pygame.Surface([self.height,self.width])
-        self.image.fill(self.color)
+        self.image = pygame.transform.flip(pygame.image.load("fishTile_074s.png").convert(),True,False)
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -46,28 +44,33 @@ class Enemy(pygame.sprite.Sprite):
 
 class Enemy_common(Enemy):
     """This class represents the ememies"""
-    def __init__(self, color, height, width, speed):
+    def __init__(self, speed):
         super().__init__()
-
-        self.image = pygame.Surface([height,width])
-        self.image.fill(color)
+        # self.image = pygame.image.load("fishTile_074.png").convert()
+        # self.image.set_colorkey(BLACK)
+        # self.rect = self.image.get_rect()
+        #self.image = pygame.Surface([height,width])
+        #self.image.fill(color)
         self.speed = speed
 
-        self.rect = self.image.get_rect()
+        #self.rect = self.image.get_rect()
 
 
 
 class Rand_enemy(Enemy):
 
-    def __init__(self, color):
+    def __init__(self):
         super().__init__()
-        self.height = random.randrange(5,20)
-        self.width =  random.randrange(5,20)
+        # self.height = random.randrange(5,20)
+        # self.width = random.randrange(5,20)
         self.speed = random.randrange(2,10)
-        self.image = pygame.Surface([self.height,self.width])
-        self.image.fill(color)
+        # self.image = pygame.image.load("fishTile_074.png").convert()
+        # self.image.set_colorkey(BLACK)
+        # self.rect = self.image.get_rect()
+        #self.image = pygame.Surface([self.height,self.width])
+        #self.image.fill(color)
 
-        self.rect = self.image.get_rect()
+        #self.rect = self.image.get_rect()
 
 
 
@@ -99,13 +102,14 @@ class Treasure(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     """ The sprite that the player controls
     This will eventually be a fish I think"""
-    def __init__(self, color, height, width):
+    def __init__(self):
         super().__init__()
 
-        self.image = pygame.Surface([height,width])
-        self.image.fill(color)
+        self.image = pygame.image.load("fishTile_080.png").convert()
+        self.image.set_colorkey(BLACK)
 
         self.rect = self.image.get_rect()
+
         self.rect.x = 20
         self.rect.y = screen_height // 2
 
@@ -117,6 +121,11 @@ def main():
 
     # Set the width and height of the screen [width,height]
     screen = pygame.display.set_mode([screen_width, screen_height])
+
+    background_image = pygame.image.load("Underwater_bubbles.jpg").convert()
+
+
+    click_sound = pygame.mixer.Sound("pop.ogg")
 
     #Set widow name
     pygame.display.set_caption("My Game")
@@ -136,9 +145,9 @@ def main():
     treasure_list = pygame.sprite.Group()
 
     # ----- Create the sprites
-    for i in range(10):
+    for i in range(5):
         #This represents an ememy
-        enemy = Enemy_common(BLUE, 10, 10, 5)
+        enemy = Enemy_common(3)
 
         #set a random location at the right of the screen
         #for the ememy to appear.
@@ -152,7 +161,7 @@ def main():
 
     for i in range(5):
         #This represents an ememy with random height, width and speed
-        rand_enemy = Rand_enemy(BLUE)
+        rand_enemy = Rand_enemy()
 
         #set a random location at the right of the screen
         #for the ememy to appear.
@@ -178,7 +187,7 @@ def main():
         treasure_list.add(treasure)
         all_spites_list.add(treasure)
 
-    player = Player(RED,15,5)
+    player = Player()
     all_spites_list.add(player)
 
     # Loop until the user clicks the close button.
@@ -230,6 +239,10 @@ def main():
         # First, clear the screen to white. Don't put other drawing commands
         # above this, or they will be erased with this command.
         screen.fill(WHITE)
+
+        screen.blit(background_image, [0, 0])
+        #screen.blit(player_image, [player.rect.x -15, player.rect.y -25])
+        #player_image.set_colorkey(BLACK)
 
         all_spites_list.update()
 
