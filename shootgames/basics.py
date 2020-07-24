@@ -45,27 +45,11 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(color)
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.speed_up = -20
-        self.speed_down = 20
-        self.stop = 0
 
         self.rect = self.image.get_rect()
         self.rect.x = 20
         self.rect.y = screen_height // 2
 
-    def set_speed(self, speed_up,speed_down,stop):
-        self.speed_up = speed_up
-        self.speed_down = speed_down
-        self.stop = stop
-
-    def moveup(self):
-        self.rect.y += self.speed_up
-
-    def movedown(self):
-        self.rect.y += self.speed_down
-
-    x_coord = 23
-    y_coord = 32
 
 def main():
     """ Main function for the game. """
@@ -113,6 +97,11 @@ def main():
     clock = pygame.time.Clock()
 
 
+    #player starting speed
+    y_speed = 0
+
+    # Player starting position
+    y_coord = screen_height // 2
 
     # -------- Main Program Loop -----------
     while not done:
@@ -121,17 +110,31 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
 
+            # User pressed down on a key
             elif event.type == pygame.KEYDOWN:
-                # Figure out if it was an arrow key. If so
+                # Figure out if it was an up or down arrow key. If so
                 # adjust speed.
+
                 if event.key == pygame.K_UP:
-                    player.moveup()
+                    y_speed = -3
                 elif event.key == pygame.K_DOWN:
-                    player.movedown()
+                    y_speed = 3
+
+            # User let up on a key
+            elif event.type == pygame.KEYUP:
+                # If it is an arrow key, reset vector back to zero
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    y_speed = 0
 
         # ALL EVENT PROCESSING SHOULD GO ABOVE THIS COMMENT
 
         # ALL GAME LOGIC SHOULD GO BELOW THIS COMMENT
+        #update player y speed
+        y_coord += y_speed
+        #update payer y coordinate
+        player.rect.y = y_coord
+
+
         all_spites_list.update()
         # ALL GAME LOGIC SHOULD GO ABOVE THIS COMMENT
 
