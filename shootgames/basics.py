@@ -64,7 +64,8 @@ class Player(pygame.sprite.Sprite):
     def movedown(self):
         self.rect.y += self.speed_down
 
-
+    x_coord = 23
+    y_coord = 32
 
 def main():
     """ Main function for the game. """
