@@ -105,7 +105,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.image = pygame.image.load("fishTile_080.png").convert()
+        self.image = pygame.transform.flip(pygame.image.load("fishTile_080.png").convert(),False,True)
         self.image.set_colorkey(BLACK)
 
         self.rect = self.image.get_rect()
