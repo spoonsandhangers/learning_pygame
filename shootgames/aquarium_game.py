@@ -7,8 +7,9 @@ This is just the frame work without graphics etc.
 """
 import pygame
 import random
+import time
 
-#Define colours
+# Define colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -19,11 +20,11 @@ screen_width = 800
 screen_height = 533
 
 
-
 # ---- Classes
 class Enemy(pygame.sprite.Sprite):
     """ This class is the enemy parent class"""
     def __init__(self):
+
         super().__init__()
         # self.screen_width = screen_width
         # self.screen_height = screen_height
@@ -42,40 +43,19 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.x = screen_width + 5
             self.rect.y = random.randrange(0,screen_height)
 
-class Enemy_common(Enemy):
-    """This class represents the ememies"""
+
+class EnemyCommon(Enemy):
+    """This class represents the enemies"""
     def __init__(self, speed):
         super().__init__()
-        # self.image = pygame.image.load("fishTile_074.png").convert()
-        # self.image.set_colorkey(BLACK)
-        # self.rect = self.image.get_rect()
-        #self.image = pygame.Surface([height,width])
-        #self.image.fill(color)
         self.speed = speed
 
-        #self.rect = self.image.get_rect()
 
-
-
-class Rand_enemy(Enemy):
-
+class RandEnemy(Enemy):
+    """This is an enemy with random speed"""
     def __init__(self):
         super().__init__()
-        # self.height = random.randrange(5,20)
-        # self.width = random.randrange(5,20)
         self.speed = random.randrange(2,10)
-        # self.image = pygame.image.load("fishTile_074.png").convert()
-        # self.image.set_colorkey(BLACK)
-        # self.rect = self.image.get_rect()
-        #self.image = pygame.Surface([self.height,self.width])
-        #self.image.fill(color)
-
-        #self.rect = self.image.get_rect()
-
-
-
-
-
 
 
 class Treasure(pygame.sprite.Sprite):
@@ -96,119 +76,73 @@ class Treasure(pygame.sprite.Sprite):
             self.rect.y = random.randrange(0,screen_height)
 
 
-
-
-
 class Player(pygame.sprite.Sprite):
     """ The sprite that the player controls
     This will eventually be a fish I think"""
     def __init__(self):
         super().__init__()
-
         self.image = pygame.transform.flip(pygame.image.load("fishTile_080.png").convert(),False,True)
         self.image.set_colorkey(BLACK)
 
         self.rect = self.image.get_rect()
-
+        # Initial player position
         self.rect.x = 20
         self.rect.y = screen_height // 2
 
 
-def main():
-    """ Main function for the game. """
-    #Initialize pygame
-    pygame.init()
+class Game(object):
+    """ This class represents an instance of the game. If we need to
+        reset the game we'd just need to create a new instance of this
+        class. """
 
-    # Set the width and height of the screen [width,height]
-    screen = pygame.display.set_mode([screen_width, screen_height])
+    def __init__(self):
+        self.score = 0
+        self.game_over = False
+        #player starting speed
+        self.y_speed = 0
+        # Player starting position
+        self.y_coord = screen_height // 2
 
-    background_image = pygame.image.load("Underwater_bubbles.jpg").convert()
+        #Create sprite lists
+        #All the sprites in the game
+        self.all_sprites_list = pygame.sprite.Group()
+        #All the enemies
+        self.enemy_list = pygame.sprite.Group()
+        #All the treasure
+        self.treasure_list = pygame.sprite.Group()
 
+        # player sprite
+        self.player = Player()
+        self.all_sprites_list.add(self.player)
 
-    click_sound = pygame.mixer.Sound("pop.ogg")
+        # ----- Create the sprites
+        for i in range(5):
+            enemy = EnemyCommon(4)
+            #set a random location at the right of the screen
+            # #for the ememy to appear.
+            enemy.rect.y = random.randrange(screen_height)
+            enemy.rect.x = random.randrange(screen_width + 5, screen_width*2)
+            self.enemy_list.add(enemy)
+            self.all_sprites_list.add(enemy)
 
-    #Set widow name
-    pygame.display.set_caption("My Game")
+        for i in range(5):
+            rand_enemy = RandEnemy()
+            rand_enemy.rect.y = random.randrange(screen_height)
+            rand_enemy.rect.x = random.randrange(screen_width + 5, screen_width*2)
+            self.enemy_list.add(rand_enemy)
+            self.all_sprites_list.add(rand_enemy)
 
-    #set score to 0
-    score = 0
+        for i in range(3):
+            treasure = Treasure(GREEN, 10, 10, 2)
+            treasure.rect.y = random.randrange(screen_height)
+            treasure.rect.x = random.randrange(screen_width + 5, screen_width*2)
+            self.treasure_list.add(treasure)
+            self.all_sprites_list.add(treasure)
 
-    # ----- Sprite lists
-
-    #All the sprites in the game
-    all_spites_list = pygame.sprite.Group()
-
-    #All the ememies
-    enemy_list = pygame.sprite.Group()
-
-    #All the treasure
-    treasure_list = pygame.sprite.Group()
-
-    # ----- Create the sprites
-    for i in range(5):
-        #This represents an ememy
-        enemy = Enemy_common(3)
-
-        #set a random location at the right of the screen
-        #for the ememy to appear.
-        enemy.rect.y = random.randrange(screen_height)
-        enemy.rect.x = random.randrange(screen_width + 5, screen_width*2)
-
-        #add the enemies to the list of sprites
-        #and the list of enemies.
-        enemy_list.add(enemy)
-        all_spites_list.add(enemy)
-
-    for i in range(5):
-        #This represents an ememy with random height, width and speed
-        rand_enemy = Rand_enemy()
-
-        #set a random location at the right of the screen
-        #for the ememy to appear.
-        rand_enemy.rect.y = random.randrange(screen_height)
-        rand_enemy.rect.x = random.randrange(screen_width + 5, screen_width*2)
-
-        #add the enemies to the list of sprites
-        #and the list of enemies.
-        enemy_list.add(rand_enemy)
-        all_spites_list.add(rand_enemy)
-
-    for i in range(3):
-        #This represents treasure
-        treasure = Treasure(GREEN, 10, 10, 2)
-
-        #set a random location at the right of the screen
-        #for the ememy to appear.
-        treasure.rect.y = random.randrange(screen_height)
-        treasure.rect.x = random.randrange(screen_width + 5, screen_width*2)
-
-        #add the treasure to the list of sprites
-        #and the list of treasure.
-        treasure_list.add(treasure)
-        all_spites_list.add(treasure)
-
-    player = Player()
-    all_spites_list.add(player)
-
-    # Loop until the user clicks the close button.
-    done = False
-
-    # Used to manage how fast the screen updates
-    clock = pygame.time.Clock()
-
-
-    #player starting speed
-    y_speed = 0
-
-    # Player starting position
-    y_coord = screen_height // 2
-
-    # -------- Main Program Loop -----------
-    while not done:
-        # ALL EVENT PROCESSING SHOULD GO BELOW THIS COMMENT
+    def process_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                self.game_over = True
 
             # User pressed down on a key
             elif event.type == pygame.KEYDOWN:
@@ -216,74 +150,110 @@ def main():
                 # adjust speed.
 
                 if event.key == pygame.K_UP:
-                    y_speed = -3
+                    self.y_speed = -3
                 elif event.key == pygame.K_DOWN:
-                    y_speed = 3
+                    self.y_speed = 3
 
             # User let up on a key
             elif event.type == pygame.KEYUP:
                 # If it is an arrow key, reset vector back to zero
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                    y_speed = 0
+                    self.y_speed = 0
 
-        # ALL EVENT PROCESSING SHOULD GO ABOVE THIS COMMENT
+        self.y_coord += self.y_speed
+        # update payer y coordinate
+        if (self.y_coord > 10) and (self.y_coord < screen_height):
+            self.player.rect.y = self.y_coord
 
-        # ALL GAME LOGIC SHOULD GO BELOW THIS COMMENT
-        #update player y speed
-        y_coord += y_speed
-        #update payer y coordinate
-        if (y_coord > 10) and (y_coord < screen_height):
-            player.rect.y = y_coord
+        return False
 
+    def run_logic(self):
+        """
+        This method is run each time through the frame. It
+        updates positions and checks for collisions.
+        """
+        if not self.game_over:
+            self.all_sprites_list.update()
 
-        # First, clear the screen to white. Don't put other drawing commands
-        # above this, or they will be erased with this command.
+            # See if the player block has collided with anything.
+            blocks_hit_list = pygame.sprite.spritecollide(self.player, self.enemy_list, False)
+            treasure_hit_list = pygame.sprite.spritecollide(self.player,self.treasure_list,True)
+
+            if len(blocks_hit_list) > 0:
+
+                print("Your enemies have triumphed!")
+                self.game_over = True
+
+            # Check the list of collisions.
+            for block in treasure_hit_list:
+                self.score += 1
+                print(self.score)
+
+            if len(self.treasure_list) == 0:
+                print("You have collected all the treasure!")
+                self.game_over = True
+
+    def display_frame(self, screen):
         screen.fill(WHITE)
-
+        background_image = pygame.image.load("Underwater_bubbles.jpg").convert()
         screen.blit(background_image, [0, 0])
-        #screen.blit(player_image, [player.rect.x -15, player.rect.y -25])
-        #player_image.set_colorkey(BLACK)
 
-        all_spites_list.update()
-
-        # See if the player block has collided with anything.
-        blocks_hit_list = pygame.sprite.spritecollide(player, enemy_list, False)
-        treasure_hit_list = pygame.sprite.spritecollide(player,treasure_list,True)
-
-        if len(blocks_hit_list) > 0:
-            done = True
-            print("Your enemies have triumphed!")
-
-        # Check the list of collisions.
-        for block in treasure_hit_list:
-            score += 1
-            print(score)
-
-        if len(treasure_list) == 0:
-            print("You have collected all the treasure!")
+        if self.game_over:
+            font = pygame.font.SysFont("serif", 35)
+            text = font.render("Game Over", True, BLACK)
+            center_x = (screen_width // 2) - (text.get_width() // 2)
+            center_y = (screen_height // 2) - (text.get_height() // 2)
+            screen.blit(text, [center_x, center_y])
             done = True
 
-        # ALL GAME LOGIC SHOULD GO ABOVE THIS COMMENT
+        if not self.game_over:
+            self.all_sprites_list.draw(screen)
+            done = False
 
-        # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
-
-
-
-
-        all_spites_list.draw(screen)
-
-        # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
-
-        # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
+        if done:
+            time.sleep(6)
+        return done
 
-        # Limit to 60 frames per second
+
+def main():
+    """ Main function for the game. """
+    # Initialize pygame
+    pygame.init()
+
+    # Set the width and height of the screen [width,height]
+    screen = pygame.display.set_mode([screen_width, screen_height])
+
+    # click_sound = pygame.mixer.Sound("pop.ogg")
+
+    # Set widow name
+    pygame.display.set_caption("My Game")
+
+    # Create objects and set the data
+    done = False
+    # Used to manage how fast the screen updates
+    clock = pygame.time.Clock()
+
+    # create an instance of the Game class
+    game = Game()
+
+    # Main game loop
+    while not done:
+        # process events
+        done = game.process_events()
+
+        # update object positions and check for collisions
+        game.run_logic()
+
+        # draw the current frame
+        done = game.display_frame(screen)
+
+        # pause for next frame
         clock.tick(60)
-
-    # Close the window and quit.
-    # If you forget this line, the program will 'hang'
-    # on exit if running from IDLE.
+    # close window and exit
     pygame.quit()
 
+
+# Call the main function start up the game
 if __name__ == "__main__":
     main()
